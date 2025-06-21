@@ -3,6 +3,8 @@ import mediapipe as mp
 import time
 import asyncio
 import socketio  # for type hinting
+from gestures import GestureRecognizer
+recognizer = GestureRecognizer()
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -27,13 +29,16 @@ def start_gesture_detection(sio: socketio.AsyncServer, loop):
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
                 current_time = time.time()
-                if current_time - prev_gesture_time > 2:
+                gesture = recognizer.detect_gesture(
+                    hand_landmarks.landmark, frame.shape[0], frame.shape[1]
+                )
+
+                if gesture:
                     asyncio.run_coroutine_threadsafe(
-                        sio.emit("gesture", {"type": "volume_up"}),
+                        sio.emit("gesture", {"type": gesture}),
                         loop
                     )
-                    print("[GESTURE] Emitted: volume_up")
-                    prev_gesture_time = current_time
+                    print(f"[GESTURE] Emitted: {gesture}")
 
         cv2.imshow("Webcam - Press Q to exit", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
