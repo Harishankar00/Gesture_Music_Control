@@ -66,7 +66,18 @@ class GestureRecognizer:
 
         fingers = self.fingers_up(landmarks)
 
-        # ✅ Volume Up: Only index finger up, others down or semi-down
+        # ✅ Play/Pause: Index and Middle up, others down
+        if (
+            fingers["index"]
+            and fingers["middle"]
+            and not fingers["ring"]
+            and not fingers["pinky"]
+            and not fingers["thumb"]
+        ):
+            self.last_gesture_time = current_time
+            return "play_pause"
+
+        # ✅ Volume Up: Only index finger up
         if (
             fingers["index"]
             and not fingers["middle"]
@@ -89,5 +100,15 @@ class GestureRecognizer:
             if swipe:
                 self.last_gesture_time = current_time
                 return swipe
+        # 👍 Play/Pause: only thumb up
+        if (
+            fingers["thumb"]
+            and not fingers["index"]
+            and not fingers["middle"]
+            and not fingers["ring"]
+            and not fingers["pinky"]
+        ):
+            self.last_gesture_time = current_time
+            return "play_pause"
 
         return None
