@@ -4,9 +4,10 @@ import socket from "./socket"; // If backend connected via socket
 import Feedback from "./components/feedback"; // Optional
 
 const playlist = [
-  { title: "Track 1", url: "/songs/track1.mp3" },
-  { title: "Track 2", url: "/songs/track2.mp3" },
+  { title: "Track 1", url: "/songs/track1.mp3", image: "/songs/track1.png" },
+  { title: "Track 2", url: "/songs/track2.mp3", image: "/songs/track2.png" },
 ];
+
 
 const App = () => {
   const [currentIndex, setCurrentIndex] = useState(0);

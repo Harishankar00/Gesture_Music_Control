@@ -1,3 +1,9 @@
 backend/venv/
+Temporary merge branch 1
+backend/__pycache__
+frontend/node_modules/
+frontend/build/
+frontend/package-lock.json
 frontend/node_modules/
 frontend/package-lock.json/
+Temporary merge branch 2
