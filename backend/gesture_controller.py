@@ -12,6 +12,19 @@ mp_drawing = mp.solutions.drawing_utils
 # Gesture recognizer instance
 recognizer = GestureRecognizer()
 
+import subprocess
+
+def execute_system_action(gesture):
+    if gesture == "volume_up":
+        subprocess.call(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%"])
+    elif gesture == "volume_down":
+        subprocess.call(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%"])
+    elif gesture == "play_pause":
+        subprocess.call(["playerctl", "play-pause"])
+    elif gesture == "next_track":
+        subprocess.call(["playerctl", "next"])
+    elif gesture == "prev_track":
+        subprocess.call(["playerctl", "previous"])
 
 def start_gesture_detection(sio: socketio.AsyncServer, loop):
     """
@@ -45,9 +58,11 @@ def start_gesture_detection(sio: socketio.AsyncServer, loop):
                 if gesture:
                     print(f"[DEBUG] Emitting gesture to loop: {gesture}")
                     # Emit via the main event loop provided
+                    execute_system_action(gesture)
                     asyncio.run_coroutine_threadsafe(
                         sio.emit("gesture", {"type": gesture}, namespace="/"),
                         loop
+                        
                     )
                     print(f"[GESTURE] Emitted: {gesture}")
 
