@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import "../styles/player.css"; // Importing the Canva-inspired CSS
+import "../styles/player.css"; // Canva-inspired styling
 
 const Player = ({
   currentTrack,
   isPlaying,
   volume,
+  setVolume,
   setIsPlaying,
   setCurrentIndex,
   playlistLength,
@@ -46,18 +47,23 @@ const Player = ({
   }, [audioRef, currentTrack]);
 
   const handlePlayPause = () => setIsPlaying((prev) => !prev);
+
   const handleNext = () =>
     setCurrentIndex((prev) => (prev + 1) % playlistLength);
+
   const handlePrev = () =>
     setCurrentIndex((prev) => (prev - 1 + playlistLength) % playlistLength);
+
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
   };
+
   const handleVolumeChange = (e) => {
     const newVol = parseFloat(e.target.value);
     audioRef.current.volume = newVol;
+    setVolume(newVol); // Keep state and audioRef in sync
   };
 
   return (
@@ -107,7 +113,7 @@ const Player = ({
         min="0"
         max="1"
         step="0.01"
-        value={audioRef.current?.volume || 0.7}
+        value={volume}
         onChange={handleVolumeChange}
       />
 
