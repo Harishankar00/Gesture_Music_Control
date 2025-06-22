@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
+import "../styles/player.css"; // Importing the Canva-inspired CSS
 
 const Player = ({
   currentTrack,
   isPlaying,
   volume,
-  setVolume,
   setIsPlaying,
   setCurrentIndex,
   playlistLength,
@@ -13,11 +13,10 @@ const Player = ({
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
-  // Sync volume and playback state
+  // Sync volume and play/pause
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
-
       if (isPlaying) {
         audioRef.current.play().catch((err) => console.log("play error:", err));
       } else {
@@ -26,7 +25,7 @@ const Player = ({
     }
   }, [isPlaying, currentTrack, volume]);
 
-  // Update current time & duration
+  // Track time updates
   useEffect(() => {
     const audio = audioRef.current;
 
@@ -46,61 +45,70 @@ const Player = ({
     };
   }, [audioRef, currentTrack]);
 
-  // Handlers
   const handlePlayPause = () => setIsPlaying((prev) => !prev);
   const handleNext = () =>
     setCurrentIndex((prev) => (prev + 1) % playlistLength);
   const handlePrev = () =>
     setCurrentIndex((prev) => (prev - 1 + playlistLength) % playlistLength);
-
-  const handleVolumeChange = (e) => {
-    const newVol = parseFloat(e.target.value);
-    setVolume(newVol);
-  };
-
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
   };
+  const handleVolumeChange = (e) => {
+    const newVol = parseFloat(e.target.value);
+    audioRef.current.volume = newVol;
+  };
 
   return (
-    <div style={{ padding: "1rem", maxWidth: "400px", margin: "auto" }}>
-      <h2>{currentTrack.title}</h2>
-      <p>Volume: {Math.round(volume * 100)}%</p>
+    <div className="player-container">
+      <h1 className="title">GESTURE MUSIC 💖</h1>
+      <h2 className="track-title">{currentTrack.title}</h2>
 
-      {/* Playback Controls */}
-      <div style={{ marginBottom: "1rem" }}>
-        <button onClick={handlePrev}>⏮ Prev</button>
-        <button onClick={handlePlayPause}>
-          {isPlaying ? "⏸ Pause" : "▶️ Play"}
-        </button>
-        <button onClick={handleNext}>⏭ Next</button>
+      <div className="cd-container">
+        <img
+          src={currentTrack.image || "/songs/cd-default.png"}
+          alt="CD cover"
+          className={`cd ${isPlaying ? "rotate" : ""}`}
+        />
       </div>
 
-      {/* Track progress bar */}
+      <div className="controls-top">
+        <i className="fas fa-heart"></i>
+        <i className="fas fa-volume-up"></i>
+      </div>
+
       <input
+        className="progress"
         type="range"
         min="0"
         max={duration || 0}
         step="0.1"
         value={currentTime}
         onChange={handleSeek}
-        style={{ width: "100%" }}
       />
-      <div>
-        {formatTime(currentTime)} / {formatTime(duration)}
+      <div>{formatTime(currentTime)} / {formatTime(duration)}</div>
+
+      <div className="controls">
+        <button onClick={handlePrev}>
+          <i className="fas fa-backward"></i>
+        </button>
+        <button onClick={handlePlayPause}>
+          <i className={`fas ${isPlaying ? "fa-pause" : "fa-play"}`}></i>
+        </button>
+        <button onClick={handleNext}>
+          <i className="fas fa-forward"></i>
+        </button>
       </div>
 
-      {/* Volume slider (controlled) */}
       <input
+        className="volume"
         type="range"
         min="0"
         max="1"
         step="0.01"
-        value={volume}
+        value={audioRef.current?.volume || 0.7}
         onChange={handleVolumeChange}
-        style={{ width: "100%", marginTop: "1rem" }}
       />
 
       <audio ref={audioRef} src={currentTrack.url} />
